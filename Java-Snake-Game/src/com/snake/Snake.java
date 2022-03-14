@@ -1,33 +1,330 @@
 package com.snake;
 
-import java.awt.EventQueue;
-import javax.swing.JFrame;
+import java.awt.Color;
 
-public class Snake extends JFrame {
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
-    public Snake() {
+
+
+public class Board extends JPanel implements ActionListener {
+
+    private final int B_WIDTH = 600;//frame width
+    private final int B_HEIGHT = 600;//frame height
+    private final int DOT_SIZE = 10;
+    private final int ALL_DOTS = 900;
+    private final int RAND_POS = 29;
+    private final int DELAY = 140; //controls speed
+    private final int TARGET = 5;
+    private final int CUBE_DEPTH = 5; //parameter for 3d cube
+
+    private final int x[] = new int[ALL_DOTS];
+    private final int y[] = new int[ALL_DOTS];
+
+    private int dots;
+    private int apple_x;
+    private int apple_y;
+    private int bombx, bomby;
+
+    private boolean leftDirection = false;
+    private boolean rightDirection = true;
+    private boolean upDirection = false;
+    private boolean downDirection = false;
+    private boolean inGame = true;
+    private boolean winner = false;
+    
+    private Timer timer;
+    private Image bomb;
+    private Image apple;
+    Cube cube;
+
+    public Board() {
         
-        initUI();
+        initBoard();
     }
     
-    private void initUI() {
-        
-        add(new Board());
-               
-        setResizable(false);
-        pack();
-        
-        setTitle("Snake");
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    private void initBoard() {
+
+        addKeyListener(new TAdapter());
+        setBackground(Color.black);
+        setFocusable(true);
+
+        setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
+        loadImages();
+        initGame();
+    }
+
+    private void loadImages() {
+
+       
+
+       // ImageIcon iia = new ImageIcon("src/resources/apple.png");
+       // apple = iia.getImage();
+
+      
+    }
+
+    private void initGame() {
+
+        dots = 3;
+
+        for (int z = 0; z < dots; z++) {
+            x[z] = 50 - z * 10;
+            y[z] = 50;
+        }
+        locateBomb();
+        locateApple();
+
+        timer = new Timer(DELAY, this);
+        timer.start();
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        doDrawing(g);
     }
     
-
-    public static void main(String[] args) {
+    private void doDrawing(Graphics g) {
         
-        EventQueue.invokeLater(() -> {
-            JFrame ex = new Snake();
-            ex.setVisible(true);
-        });
+        if (inGame) {
+        	//g.setColor(java.awt.Color.GREEN);
+        	//g.draw3DRect(20, 20, 20, 20, false);
+        	//g.fill3DRect(20, 20, 20, 20, false);
+        	if (dots==TARGET)
+        	{
+        		winScreen(g);
+        	}
+        	else {
+        	//cube = new Cube(20,20, DOT_SIZE, CUBE_DEPTH);
+        	//cube.drawCube(g);
+        	g.setColor(java.awt.Color.GREEN);
+        	//g.fillRect(20, 20, DOT_SIZE, DOT_SIZE);
+        	String score= "Current Snake Size = "+dots;
+        	String target = "Target Snake Size = "+TARGET;
+        	String info = "Red = apple";
+        	String info2 ="Yellow = bomb";
+        	
+        	//printing out game info onto the panel
+        	g.setColor(java.awt.Color.GREEN);
+        	g.drawString(score, B_WIDTH-150,50);
+        	g.drawString(target, B_WIDTH-150,70);
+        	g.setColor(java.awt.Color.RED);
+        	g.drawString(info, B_WIDTH-150,90);
+        	g.setColor(java.awt.Color.YELLOW);
+        	g.drawString(info2, B_WIDTH-150,110);
+            //g.drawImage(apple, apple_x, apple_y, this);
+        	
+        	//draw cubes for all objects in the game
+        	g.setColor(java.awt.Color.RED);
+        	//g.draw3DRect(apple_x, apple_y, DOT_SIZE, DOT_SIZE, true);
+        	cube = new Cube(apple_x, apple_y, DOT_SIZE, CUBE_DEPTH);
+        	cube.drawCube(g);
+            g.setColor(java.awt.Color.YELLOW);
+            //g.draw3DRect(bombx, bomby, DOT_SIZE, DOT_SIZE, true);
+            cube = new Cube(bombx, bomby, DOT_SIZE, CUBE_DEPTH);
+        	cube.drawCube(g);
+
+            for (int z = 0; z < dots; z++) {
+                if (z == 0) {
+                	g.setColor(java.awt.Color.GREEN);
+                	//g.draw3DRect(x[z], y[z], 10, 10, true);
+                	//g.fill3DRect(x[z], y[z], DOT_SIZE, DOT_SIZE, true);
+                	cube = new Cube(x[z], y[z], DOT_SIZE, CUBE_DEPTH);
+                	cube.drawCube(g);
+                } else {
+                	g.setColor(java.awt.Color.BLUE);
+                	//g.draw3DRect(x[z], y[z], 10, 10, true);
+                	//g.fill3DRect(x[z], y[z], DOT_SIZE, DOT_SIZE, true);
+                	cube = new Cube(x[z], y[z], DOT_SIZE, CUBE_DEPTH);
+                	cube.drawCube(g);
+                }
+            }
+
+            Toolkit.getDefaultToolkit().sync();
+        	}
+
+        }
+        else{
+
+            gameOver(g);
+        }        
+    }
+
+    private void gameOver(Graphics g) {
+        
+        String msg = "Game Over";
+        Font small = new Font("Helvetica", Font.BOLD, 14);
+        FontMetrics metr = getFontMetrics(small);
+
+        g.setColor(Color.white);
+        g.setFont(small);
+        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+    }
+private void winScreen(Graphics g) {
+        
+        String msg = "You Win!";
+        Font small = new Font("Helvetica", Font.BOLD, 14);
+        FontMetrics metr = getFontMetrics(small);
+
+        g.setColor(Color.white);
+        g.setFont(small);
+        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+    }
+
+    private void checkApple() {
+
+        if ((x[0] == apple_x) && (y[0] == apple_y)) {
+
+            dots++;
+            locateApple();
+        }
+    }
+    private void checkBomb() {
+
+        if ((x[0] == bombx) && (y[0] == bomby)) {
+
+            
+            	inGame=false;
+        }
+    }
+    private void move() {
+
+        for (int z = dots; z > 0; z--) {
+            x[z] = x[(z - 1)];
+            y[z] = y[(z - 1)];
+        }
+
+        if (leftDirection) {
+            x[0] -= DOT_SIZE;
+        }
+
+        if (rightDirection) {
+            x[0] += DOT_SIZE;
+        }
+
+        if (upDirection) {
+            y[0] -= DOT_SIZE;
+        }
+
+        if (downDirection) {
+            y[0] += DOT_SIZE;
+        }
+    }
+
+    private void checkCollision() {
+
+        for (int z = dots; z > 0; z--) {
+
+            if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+                inGame = false;
+            }
+        }
+
+        if (y[0] >= B_HEIGHT) {
+            inGame = false;
+        }
+
+        if (y[0] < 0) {
+            inGame = false;
+        }
+
+        if (x[0] >= B_WIDTH) {
+            inGame = false;
+        }
+
+        if (x[0] < 0) {
+            inGame = false;
+        }
+        
+        if (!inGame) {
+            timer.stop();
+        }
+    }
+
+    private void locateApple() {
+
+        int r = (int) (Math.random() * RAND_POS);
+        apple_x = ((r * DOT_SIZE));
+
+        r = (int) (Math.random() * RAND_POS);
+        apple_y = ((r * DOT_SIZE));
+    }
+    
+    private void locateBomb()
+    {
+    	int r = (int) (Math.random() * RAND_POS);
+        bombx = ((r * DOT_SIZE));
+
+        r = (int) (Math.random() * RAND_POS);
+        bomby = ((r * DOT_SIZE));
+        
+        if (bombx==apple_x && bomby == apple_y)
+        {
+        	r = (int) (Math.random() * RAND_POS);
+            bombx = ((r * DOT_SIZE));
+
+            r = (int) (Math.random() * RAND_POS);
+            bomby = ((r * DOT_SIZE));
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (inGame) {
+
+            checkApple();
+            checkBomb();
+            checkCollision();
+            move();
+        }
+
+        repaint();
+    }
+
+    private class TAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+
+            int key = e.getKeyCode();
+
+            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
+                leftDirection = true;
+                upDirection = false;
+                downDirection = false;
+            }
+
+            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
+                rightDirection = true;
+                upDirection = false;
+                downDirection = false;
+            }
+
+            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
+                upDirection = true;
+                rightDirection = false;
+                leftDirection = false;
+            }
+
+            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
+                downDirection = true;
+                rightDirection = false;
+                leftDirection = false;
+            }
+        }
     }
 }
