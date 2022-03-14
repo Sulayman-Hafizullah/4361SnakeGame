@@ -27,6 +27,7 @@ public class Board extends JPanel implements ActionListener {
     private final int RAND_POS = 29;
     private final int DELAY = 140; //controls speed
     private final int TARGET = 5;
+    private final int CUBE_DEPTH = 5; //parameter for 3d cube
 
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
@@ -46,6 +47,7 @@ public class Board extends JPanel implements ActionListener {
     private Timer timer;
     private Image bomb;
     private Image apple;
+    Cube cube;
 
     public Board() {
         
@@ -67,8 +69,8 @@ public class Board extends JPanel implements ActionListener {
 
        
 
-        ImageIcon iia = new ImageIcon("src/resources/apple.png");
-        apple = iia.getImage();
+       // ImageIcon iia = new ImageIcon("src/resources/apple.png");
+       // apple = iia.getImage();
 
       
     }
@@ -106,24 +108,48 @@ public class Board extends JPanel implements ActionListener {
         		winScreen(g);
         	}
         	else {
+        	//cube = new Cube(20,20, DOT_SIZE, CUBE_DEPTH);
+        	//cube.drawCube(g);
+        	g.setColor(java.awt.Color.GREEN);
+        	//g.fillRect(20, 20, DOT_SIZE, DOT_SIZE);
         	String score= "Current Snake Size = "+dots;
         	String target = "Target Snake Size = "+TARGET;
+        	String info = "Red = apple";
+        	String info2 ="Yellow = bomb";
+        	
+        	//printing out game info onto the panel
         	g.setColor(java.awt.Color.GREEN);
         	g.drawString(score, B_WIDTH-150,50);
         	g.drawString(target, B_WIDTH-150,70);
-            g.drawImage(apple, apple_x, apple_y, this);
+        	g.setColor(java.awt.Color.RED);
+        	g.drawString(info, B_WIDTH-150,90);
+        	g.setColor(java.awt.Color.YELLOW);
+        	g.drawString(info2, B_WIDTH-150,110);
+            //g.drawImage(apple, apple_x, apple_y, this);
+        	
+        	//draw cubes for all objects in the game
+        	g.setColor(java.awt.Color.RED);
+        	//g.draw3DRect(apple_x, apple_y, DOT_SIZE, DOT_SIZE, true);
+        	cube = new Cube(apple_x, apple_y, DOT_SIZE, CUBE_DEPTH);
+        	cube.drawCube(g);
             g.setColor(java.awt.Color.YELLOW);
-            g.draw3DRect(bombx, bomby, 10, 10, true);
+            //g.draw3DRect(bombx, bomby, DOT_SIZE, DOT_SIZE, true);
+            cube = new Cube(bombx, bomby, DOT_SIZE, CUBE_DEPTH);
+        	cube.drawCube(g);
 
             for (int z = 0; z < dots; z++) {
                 if (z == 0) {
                 	g.setColor(java.awt.Color.GREEN);
                 	//g.draw3DRect(x[z], y[z], 10, 10, true);
-                	g.fill3DRect(x[z], y[z], 10, 10, true);
+                	//g.fill3DRect(x[z], y[z], DOT_SIZE, DOT_SIZE, true);
+                	cube = new Cube(x[z], y[z], DOT_SIZE, CUBE_DEPTH);
+                	cube.drawCube(g);
                 } else {
                 	g.setColor(java.awt.Color.BLUE);
                 	//g.draw3DRect(x[z], y[z], 10, 10, true);
-                	g.fill3DRect(x[z], y[z], 10, 10, true);
+                	//g.fill3DRect(x[z], y[z], DOT_SIZE, DOT_SIZE, true);
+                	cube = new Cube(x[z], y[z], DOT_SIZE, CUBE_DEPTH);
+                	cube.drawCube(g);
                 }
             }
 
