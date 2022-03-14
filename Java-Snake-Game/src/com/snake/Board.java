@@ -26,6 +26,7 @@ public class Board extends JPanel implements ActionListener {
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
     private final int DELAY = 140; //controls speed
+    private final int TARGET = 5;
 
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
@@ -40,7 +41,8 @@ public class Board extends JPanel implements ActionListener {
     private boolean upDirection = false;
     private boolean downDirection = false;
     private boolean inGame = true;
-
+    private boolean winner = false;
+    
     private Timer timer;
     private Image bomb;
     private Image apple;
@@ -99,6 +101,16 @@ public class Board extends JPanel implements ActionListener {
         	//g.setColor(java.awt.Color.GREEN);
         	//g.draw3DRect(20, 20, 20, 20, false);
         	//g.fill3DRect(20, 20, 20, 20, false);
+        	if (dots==TARGET)
+        	{
+        		winScreen(g);
+        	}
+        	else {
+        	String score= "Current Snake Size = "+dots;
+        	String target = "Target Snake Size = "+TARGET;
+        	g.setColor(java.awt.Color.GREEN);
+        	g.drawString(score, B_WIDTH-150,50);
+        	g.drawString(target, B_WIDTH-150,70);
             g.drawImage(apple, apple_x, apple_y, this);
             g.setColor(java.awt.Color.YELLOW);
             g.draw3DRect(bombx, bomby, 10, 10, true);
@@ -106,18 +118,20 @@ public class Board extends JPanel implements ActionListener {
             for (int z = 0; z < dots; z++) {
                 if (z == 0) {
                 	g.setColor(java.awt.Color.GREEN);
-                	g.draw3DRect(x[z], y[z], 10, 10, true);
+                	//g.draw3DRect(x[z], y[z], 10, 10, true);
                 	g.fill3DRect(x[z], y[z], 10, 10, true);
                 } else {
                 	g.setColor(java.awt.Color.BLUE);
-                	g.draw3DRect(x[z], y[z], 10, 10, true);
+                	//g.draw3DRect(x[z], y[z], 10, 10, true);
                 	g.fill3DRect(x[z], y[z], 10, 10, true);
                 }
             }
 
             Toolkit.getDefaultToolkit().sync();
+        	}
 
-        } else {
+        }
+        else{
 
             gameOver(g);
         }        
@@ -126,6 +140,16 @@ public class Board extends JPanel implements ActionListener {
     private void gameOver(Graphics g) {
         
         String msg = "Game Over";
+        Font small = new Font("Helvetica", Font.BOLD, 14);
+        FontMetrics metr = getFontMetrics(small);
+
+        g.setColor(Color.white);
+        g.setFont(small);
+        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+    }
+private void winScreen(Graphics g) {
+        
+        String msg = "You Win!";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
 
