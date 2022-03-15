@@ -1,15 +1,11 @@
 package com.snake;
 
-import java.awt.Color;
-import java.lang.Object;
-import java.awt.Dimension;
+
 import java.awt.Graphics;
 import java.awt.Point;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
-import com.sun.j3d.utils.geometry.Sphere;
+
+
 
 public class Cube {
 	int x, y, size, shift;
