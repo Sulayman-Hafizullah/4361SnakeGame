@@ -2,7 +2,6 @@ package com.snake;
 
 import java.awt.Color;
 import java.lang.Object;
-import javax.media.j3d.*;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
