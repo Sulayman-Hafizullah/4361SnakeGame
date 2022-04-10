@@ -13,11 +13,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -37,6 +41,7 @@ public class Board extends JPanel implements ActionListener {
 	private int apple_y;
 	private int bombx, bomby;
 	private int delay = 140;// controls speed
+	private int scorenum = 0;
 	private String win = "";
 	private boolean newLevel = false;
 
@@ -50,6 +55,7 @@ public class Board extends JPanel implements ActionListener {
 	private Timer timer;
 	private Image bomb;
 	private Image apple;
+	private Image backgrnd;
 	Cube cube;
 
 	private int level = 1;
@@ -69,10 +75,12 @@ public class Board extends JPanel implements ActionListener {
 		loadImages();
 		initGame();
 	}
-	
-	//use this method to import images into the game
-	private void loadImages() {
 
+	// use this method to import images into the game
+	private void loadImages() {
+		// load in background image
+		ImageIcon background = new ImageIcon("Java-Snake-Game/src/resources/sand.jpg");
+		backgrnd = background.getImage();
 		// ImageIcon iia = new ImageIcon("src/resources/apple.png");
 		// apple = iia.getImage();
 
@@ -90,36 +98,37 @@ public class Board extends JPanel implements ActionListener {
 		locateApple();
 
 		// makes the snake go faster
-		//delay = delay ;
-		
+		// delay = delay ;
+
 		timer = new Timer(delay, this);
 		timer.start();
-		
 
 	}
 
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		// draw background before other items
+		g.drawImage(backgrnd, 0, 0, this);
 
 		try {
 			// prints the win variable which is empty until the level is complete
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = getFontMetrics(small);
-			g.setColor(Color.white);
+			g.setColor(Color.BLACK);
 			g.setFont(small);
 			g.drawString(win, (B_WIDTH - metr.stringWidth(win)) / 2, B_HEIGHT / 2);
 			g.setColor(Color.white);
 
 			doDrawing(g);
-		} catch (InterruptedException e) {
+		} catch (InterruptedException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
-	private void doDrawing(Graphics g) throws InterruptedException {
+	private void doDrawing(Graphics g) throws InterruptedException, IOException {
 
 		if (inGame) {
 
@@ -144,19 +153,21 @@ public class Board extends JPanel implements ActionListener {
 				g.setFont(small2);
 				// g.fillRect(20, 20, DOT_SIZE, DOT_SIZE);
 				String score = "Current Snake Size = " + dots;
+				String scoreVal = "Current Score = " + scorenum;
 				String target = "Target Snake Size = " + TARGET;
 				String info = "Red = apple";
-				String info2 = "Yellow = bomb";
+				String info2 = "Black = bomb";
 				String levelInfo = "Level " + level;
 
 				// printing out game info onto the panel
-				g.setColor(java.awt.Color.GREEN);
+				g.setColor(java.awt.Color.blue);
+				g.drawString(scoreVal, B_WIDTH - 150, 30);
 				g.drawString(score, B_WIDTH - 150, 50);
 				g.drawString(target, B_WIDTH - 150, 70);
 				g.drawString(levelInfo, B_WIDTH - 150, 90);
 				g.setColor(java.awt.Color.RED);
 				g.drawString(info, B_WIDTH - 150, 110);
-				g.setColor(java.awt.Color.YELLOW);
+				g.setColor(java.awt.Color.black);
 				g.drawString(info2, B_WIDTH - 150, 130);
 				// g.drawImage(apple, apple_x, apple_y, this);
 
@@ -166,7 +177,7 @@ public class Board extends JPanel implements ActionListener {
 				// draw apple
 				cube = new Cube(apple_x, apple_y, DOT_SIZE, CUBE_DEPTH);
 				cube.drawCube(g);
-				g.setColor(java.awt.Color.YELLOW);
+				g.setColor(java.awt.Color.BLACK);
 
 				// draw bomb
 				cube = new Cube(bombx, bomby, DOT_SIZE, CUBE_DEPTH);
@@ -197,15 +208,41 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
-	private void gameOver(Graphics g) {
+	private void gameOver(Graphics g) throws IOException {
 
 		String msg = "Game Over";
 		Font small = new Font("Helvetica", Font.BOLD, 14);
 		FontMetrics metr = getFontMetrics(small);
+		String content;
+		int filescore = 0;
+		String output;
 
-		g.setColor(Color.white);
+		g.setColor(Color.black);
 		g.setFont(small);
 		g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+		File file = new File("Java-Snake-Game/src/resources/HighScore.txt");
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		content = br.readLine();// check highscores from a file
+		br.close();
+
+		filescore = Integer.parseInt(content);
+		// add highscore to file if the current score is bigger
+		if (filescore <= scorenum) {
+			FileWriter writer = new FileWriter("Java-Snake-Game/src/resources/HighScore.txt");
+			BufferedWriter bw = new BufferedWriter(writer);
+
+			// content="New HighScore!! "+scorenum;
+			output = "New HighScore!! " + scorenum;
+			g.drawString(output, (B_WIDTH - metr.stringWidth(msg)) / 2, (B_HEIGHT / 2) + 20);
+			bw.write(String.valueOf(scorenum));
+			bw.close();
+		} else if (!content.equals("0")) {
+			//write down the highscore and player score if the score is lower than the highscore
+			content = "High Score = " + content;
+			String yourScore = "Score = " + scorenum;
+			g.drawString(content, (B_WIDTH - metr.stringWidth(msg)) / 2, (B_HEIGHT / 2) + 20);
+			g.drawString(yourScore, (B_WIDTH - metr.stringWidth(msg)) / 2, (B_HEIGHT / 2) + 40);
+		}
 	}
 
 	// checks if the snake makes contact with an apple
@@ -214,6 +251,7 @@ public class Board extends JPanel implements ActionListener {
 		if ((x[0] == apple_x) && (y[0] == apple_y)) {
 
 			dots++;
+			scorenum = scorenum + (level * 5);// increase score when apple is eaten
 			if (dots == TARGET) {
 				win = "Level " + (level + 1) + " starting...";
 			}
@@ -362,3 +400,4 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 }
+
