@@ -167,7 +167,7 @@ public class Board extends JPanel implements ActionListener {
 				String levelInfo = "Level " + level;
 
 				// printing out game info onto the panel
-				g.setColor(java.awt.Color.blue);
+				g.setColor(java.awt.Color.black);
 				g.drawString(scoreVal, B_WIDTH - 150, 30);
 				g.drawString(score, B_WIDTH - 150, 50);
 				g.drawString(target, B_WIDTH - 150, 70);
