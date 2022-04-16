@@ -13,6 +13,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.media.j3d.Clip;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -60,6 +65,10 @@ public class Board extends JPanel implements ActionListener {
 	private Image apple;
 	private Image backgrnd;
 	Cube cube;
+	File munch= new File("Java-Snake-Game/src/resources/appleBite.wav");
+	File music=new File("Java-Snake-Game/src/resources/backMusic2.wav");
+	File bombSound=new File("Java-Snake-Game/src/resources/bomb.wav");
+	
 
 	private int level = 1;
 
@@ -77,6 +86,12 @@ public class Board extends JPanel implements ActionListener {
 		setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
 		loadImages();
 		initGame();
+		try {
+			playSound(music,true);
+		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// use this method to import images into the game
@@ -216,7 +231,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void gameOver(Graphics g) throws IOException {
-
+		
 		String msg = "Game Over";
 		Font small = new Font("Helvetica", Font.BOLD, 14);
 		FontMetrics metr = getFontMetrics(small);
@@ -253,10 +268,11 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	// checks if the snake makes contact with an apple
-	private void checkApple() {
+	private void checkApple() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+		
 
 		if ((x[0] == apple_x) && (y[0] == apple_y)) {
-
+			playSound(munch,false);
 			dots++;
 			scorenum = scorenum + (level * 5);// increase score when apple is eaten
 			if (dots == TARGET) {
@@ -265,11 +281,27 @@ public class Board extends JPanel implements ActionListener {
 			locateApple();
 		}
 	}
-
+	private void playSound(File munch2,boolean repeat) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+	    File f = new File("./" + munch2);
+	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());  
+	    javax.sound.sampled.Clip clip = AudioSystem.getClip();
+	    clip.open(audioIn);
+	    clip.start();
+	    if (repeat)
+	    {
+	    clip.loop(javax.sound.sampled.Clip.LOOP_CONTINUOUSLY);
+	    }
+	}
 	// checks if the snake makes contact with a bomb
 	private void checkBomb() {
 
 		if ((x[0] == bombx) && (y[0] == bomby)) {
+			try {
+				playSound(bombSound,false);
+			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			inGame = false;
 		}
@@ -363,7 +395,12 @@ public class Board extends JPanel implements ActionListener {
 
 		if (inGame) {
 
-			checkApple();
+			try {
+				checkApple();
+			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			checkBomb();
 			checkCollision();
 			move();
