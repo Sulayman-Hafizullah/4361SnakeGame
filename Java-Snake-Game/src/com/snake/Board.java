@@ -12,7 +12,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +69,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void initBoard() {
-
+		
 		addKeyListener(new TAdapter());
 		setBackground(Color.black);
 		setFocusable(true);
@@ -80,7 +83,11 @@ public class Board extends JPanel implements ActionListener {
 	private void loadImages() {
 		// load in background image
 		ImageIcon background = new ImageIcon("Java-Snake-Game/src/resources/sand.jpg");
-		backgrnd = background.getImage();
+		//backgrnd = background.getImage();
+		
+		Icon icon = new ImageIcon("Java-Snake-Game/src/resources/bck4.gif");
+		backgrnd = ((ImageIcon) icon).getImage();
+		//setContentPane(new JLabel(icon));
 		// ImageIcon iia = new ImageIcon("src/resources/apple.png");
 		// apple = iia.getImage();
 
@@ -400,4 +407,3 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 }
-

@@ -2,7 +2,11 @@ package com.snake;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 
 public class Snake extends JFrame {
@@ -27,11 +31,13 @@ public class Snake extends JFrame {
     
 
     public static void main(String[] args) {
-        
+    	//Icon icon = new ImageIcon("Java-Snake-Game/src/resources/background1.gif");
+		
         EventQueue.invokeLater(() -> {
             JFrame ex;
 			try {
 				ex = new Snake();
+				//ex.setContentPane(new JLabel(icon));
 				ex.setVisible(true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -41,4 +47,3 @@ public class Snake extends JFrame {
         });
     }
 }
-
