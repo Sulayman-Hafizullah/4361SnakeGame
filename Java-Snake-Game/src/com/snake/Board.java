@@ -64,6 +64,7 @@ public class Board extends JPanel implements ActionListener {
 	private Image apple;
 	private Image backgrnd;
 	Cube cube;
+	//sound files
 	File munch = new File("src/resources/appleBite.wav");
 	File music = new File("src/resources/backmusic2.wav");
 	File bombSound = new File("src/resources/bomb.wav");
@@ -84,6 +85,8 @@ public class Board extends JPanel implements ActionListener {
 		setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
 		loadImages();
 		initGame();
+		
+		//play background music
 		try {
 			playSound(music, true);
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
@@ -128,6 +131,11 @@ public class Board extends JPanel implements ActionListener {
 			timer.restart();
 
 		}
+		downDirection = false;
+		rightDirection = false;
+		leftDirection = false;
+		upDirection=false;
+		
 
 	}
 
