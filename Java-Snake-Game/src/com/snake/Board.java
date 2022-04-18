@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
@@ -38,7 +37,7 @@ public class Board extends JPanel implements ActionListener {
 	private final int DOT_SIZE = 10;
 	private final int ALL_DOTS = 900;
 	private final int RAND_POS = 29;
-	private final int TARGET = 15;
+	private final int TARGET = 5;
 	private final int CUBE_DEPTH = 5; // parameter for 3d cube
 
 	private final int x[] = new int[ALL_DOTS];
@@ -65,10 +64,9 @@ public class Board extends JPanel implements ActionListener {
 	private Image apple;
 	private Image backgrnd;
 	Cube cube;
-	File munch= new File("src/resources/appleBite.wav");
-	File music=new File("src/resources/backmusic2.wav");
-	File bombSound=new File("src/resources/bomb.wav");
-	
+	File munch = new File("src/resources/appleBite.wav");
+	File music = new File("src/resources/backmusic2.wav");
+	File bombSound = new File("src/resources/bomb.wav");
 
 	private int level = 1;
 
@@ -78,7 +76,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void initBoard() {
-		
+
 		addKeyListener(new TAdapter());
 		setBackground(Color.black);
 		setFocusable(true);
@@ -87,7 +85,7 @@ public class Board extends JPanel implements ActionListener {
 		loadImages();
 		initGame();
 		try {
-			playSound(music,true);
+			playSound(music, true);
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -98,11 +96,11 @@ public class Board extends JPanel implements ActionListener {
 	private void loadImages() {
 		// load in background image
 		ImageIcon background = new ImageIcon("src/resources/sand.jpg");
-		//backgrnd = background.getImage();
-		
+		// backgrnd = background.getImage();
+
 		Icon icon = new ImageIcon("src/resources/bck4.gif");
 		backgrnd = ((ImageIcon) icon).getImage();
-		//setContentPane(new JLabel(icon));
+		// setContentPane(new JLabel(icon));
 		// ImageIcon iia = new ImageIcon("src/resources/apple.png");
 		// apple = iia.getImage();
 
@@ -121,9 +119,15 @@ public class Board extends JPanel implements ActionListener {
 
 		// makes the snake go faster
 		// delay = delay ;
+		if (level == 1) {
+			timer = new Timer(delay, this);
+			timer.start();
+		} else {
+			timer.stop();
+			timer = new Timer(delay - level * 10, this);
+			timer.restart();
 
-		timer = new Timer(delay, this);
-		timer.start();
+		}
 
 	}
 
@@ -231,7 +235,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void gameOver(Graphics g) throws IOException {
-		
+
 		String msg = "Game Over";
 		Font small = new Font("Helvetica", Font.BOLD, 14);
 		FontMetrics metr = getFontMetrics(small);
@@ -259,7 +263,8 @@ public class Board extends JPanel implements ActionListener {
 			bw.write(String.valueOf(scorenum));
 			bw.close();
 		} else if (!content.equals("0")) {
-			//write down the highscore and player score if the score is lower than the highscore
+			// write down the highscore and player score if the score is lower than the
+			// highscore
 			content = "High Score = " + content;
 			String yourScore = "Score = " + scorenum;
 			g.drawString(content, (B_WIDTH - metr.stringWidth(msg)) / 2, (B_HEIGHT / 2) + 20);
@@ -269,10 +274,9 @@ public class Board extends JPanel implements ActionListener {
 
 	// checks if the snake makes contact with an apple
 	private void checkApple() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
-		
 
 		if ((x[0] == apple_x) && (y[0] == apple_y)) {
-			playSound(munch,false);
+			playSound(munch, false);
 			dots++;
 			scorenum = scorenum + (level * 5);// increase score when apple is eaten
 			if (dots == TARGET) {
@@ -281,23 +285,25 @@ public class Board extends JPanel implements ActionListener {
 			locateApple();
 		}
 	}
-	private void playSound(File munch2,boolean repeat) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
-	    File f = new File("./" + munch2);
-	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());  
-	    javax.sound.sampled.Clip clip = AudioSystem.getClip();
-	    clip.open(audioIn);
-	    clip.start();
-	    if (repeat)
-	    {
-	    clip.loop(javax.sound.sampled.Clip.LOOP_CONTINUOUSLY);
-	    }
+
+	private void playSound(File munch2, boolean repeat)
+			throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+		File f = new File("./" + munch2);
+		AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());
+		javax.sound.sampled.Clip clip = AudioSystem.getClip();
+		clip.open(audioIn);
+		clip.start();
+		if (repeat) {
+			clip.loop(javax.sound.sampled.Clip.LOOP_CONTINUOUSLY);
+		}
 	}
+
 	// checks if the snake makes contact with a bomb
 	private void checkBomb() {
 
 		if ((x[0] == bombx) && (y[0] == bomby)) {
 			try {
-				playSound(bombSound,false);
+				playSound(bombSound, false);
 			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
