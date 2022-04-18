@@ -23,7 +23,7 @@ public class Snake extends JFrame {
         setResizable(false);
         pack();
         
-        setTitle("3D Snake Game");
+        setTitle("Geometry Snake Game");
         //setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("C:/Users/Sulayman/Desktop/CS4361/4361SnakeGame/Java-Snake-Game/src/resources/sand.jpg")))));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
