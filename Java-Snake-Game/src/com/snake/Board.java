@@ -65,9 +65,9 @@ public class Board extends JPanel implements ActionListener {
 	private Image apple;
 	private Image backgrnd;
 	Cube cube;
-	File munch= new File("Java-Snake-Game/src/resources/appleBite.wav");
-	File music=new File("Java-Snake-Game/src/resources/backMusic2.wav");
-	File bombSound=new File("Java-Snake-Game/src/resources/bomb.wav");
+	File munch= new File("src/resources/appleBite.wav");
+	File music=new File("src/resources/backmusic2.wav");
+	File bombSound=new File("src/resources/bomb.wav");
 	
 
 	private int level = 1;
@@ -97,10 +97,10 @@ public class Board extends JPanel implements ActionListener {
 	// use this method to import images into the game
 	private void loadImages() {
 		// load in background image
-		ImageIcon background = new ImageIcon("Java-Snake-Game/src/resources/sand.jpg");
+		ImageIcon background = new ImageIcon("src/resources/sand.jpg");
 		//backgrnd = background.getImage();
 		
-		Icon icon = new ImageIcon("Java-Snake-Game/src/resources/bck4.gif");
+		Icon icon = new ImageIcon("src/resources/bck4.gif");
 		backgrnd = ((ImageIcon) icon).getImage();
 		//setContentPane(new JLabel(icon));
 		// ImageIcon iia = new ImageIcon("src/resources/apple.png");
@@ -242,7 +242,7 @@ public class Board extends JPanel implements ActionListener {
 		g.setColor(Color.black);
 		g.setFont(small);
 		g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
-		File file = new File("Java-Snake-Game/src/resources/HighScore.txt");
+		File file = new File("src/resources/HighScore.txt");
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		content = br.readLine();// check highscores from a file
 		br.close();
@@ -250,7 +250,7 @@ public class Board extends JPanel implements ActionListener {
 		filescore = Integer.parseInt(content);
 		// add highscore to file if the current score is bigger
 		if (filescore <= scorenum) {
-			FileWriter writer = new FileWriter("Java-Snake-Game/src/resources/HighScore.txt");
+			FileWriter writer = new FileWriter(file);
 			BufferedWriter bw = new BufferedWriter(writer);
 
 			// content="New HighScore!! "+scorenum;
