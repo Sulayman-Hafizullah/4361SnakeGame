@@ -37,7 +37,7 @@ public class Board extends JPanel implements ActionListener {
 	private final int DOT_SIZE = 10;
 	private final int ALL_DOTS = 900;
 	private final int RAND_POS = 29;
-	private final int TARGET = 5;
+	private final int TARGET = 10;
 	private final int CUBE_DEPTH = 5; // parameter for 3d cube
 
 	private final int x[] = new int[ALL_DOTS];
