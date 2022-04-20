@@ -43,10 +43,13 @@ public class Board extends JPanel implements ActionListener {
 	private final int x[] = new int[ALL_DOTS];
 	private final int y[] = new int[ALL_DOTS];
 
+	private int LIVES = 1;
 	private int dots;
 	private int apple_x;
 	private int apple_y;
 	private int bombx, bomby;
+	private int speed_x, speed_y;
+	private int lives_x, lives_y;
 	private int delay = 140;// controls speed
 	private int scorenum = 0;
 	private String win = "";
@@ -119,15 +122,18 @@ public class Board extends JPanel implements ActionListener {
 		}
 		locateBomb();
 		locateApple();
+		locateSpeed();
 
 		// makes the snake go faster
 		// delay = delay ;
 		if (level == 1) {
 			timer = new Timer(delay, this);
 			timer.start();
+		} else if(level % 2 == 0) {
+			locateSecondLife();
 		} else {
 			timer.stop();
-			timer = new Timer(delay - level * 10, this);
+			timer = new Timer(delay - level * 20, this);
 			timer.restart();
 
 		}
@@ -189,8 +195,11 @@ public class Board extends JPanel implements ActionListener {
 				String score = "Current Snake Size = " + dots;
 				String scoreVal = "Current Score = " + scorenum;
 				String target = "Target Snake Size = " + TARGET;
+				String lives = "Number of lives = " + LIVES;
 				String info = "Red = apple";
 				String info2 = "Black = bomb";
+				String info3 = "Orange = slow power-up";
+				String info4 = "Magenta = +1Life";
 				String levelInfo = "Level " + level;
 
 				// printing out game info onto the panel
@@ -199,20 +208,36 @@ public class Board extends JPanel implements ActionListener {
 				g.drawString(score, B_WIDTH - 150, 50);
 				g.drawString(target, B_WIDTH - 150, 70);
 				g.drawString(levelInfo, B_WIDTH - 150, 90);
+				g.drawString(lives, B_WIDTH - 150, 110);
 				g.setColor(java.awt.Color.RED);
-				g.drawString(info, B_WIDTH - 150, 110);
+				g.drawString(info, B_WIDTH - 150, 130);
 				g.setColor(java.awt.Color.black);
-				g.drawString(info2, B_WIDTH - 150, 130);
+				g.drawString(info2, B_WIDTH - 150, 150);
+				g.setColor(java.awt.Color.orange);
+				g.drawString(info3, B_WIDTH - 150, 170);
+				g.setColor(java.awt.Color.MAGENTA);
+				g.drawString(info4, B_WIDTH - 150, 190);
 				// g.drawImage(apple, apple_x, apple_y, this);
 
 				// draw cubes for all objects in the game
 				g.setColor(java.awt.Color.RED);
-
 				// draw apple
 				cube = new Cube(apple_x, apple_y, DOT_SIZE, CUBE_DEPTH);
 				cube.drawCube(g);
+				
+				//draw slow speed powerup
+				g.setColor(java.awt.Color.ORANGE);
+				cube = new Cube(speed_x, speed_y, DOT_SIZE, CUBE_DEPTH);
+				cube.drawCube(g);
+				
+				//draw second life powerup
+				if(level % 2 == 0) {
+					g.setColor(java.awt.Color.MAGENTA);
+					cube = new Cube(lives_x, lives_y, DOT_SIZE, CUBE_DEPTH);
+					cube.drawCube(g);
+				}
+				
 				g.setColor(java.awt.Color.BLACK);
-
 				// draw bomb
 				cube = new Cube(bombx, bomby, DOT_SIZE, CUBE_DEPTH);
 				cube.drawCube(g);
@@ -293,6 +318,31 @@ public class Board extends JPanel implements ActionListener {
 			locateApple();
 		}
 	}
+	
+	// checks if the snake makes contact with a speed powerup that slows the snake down
+	private void checkSpeed() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+
+		if ((x[0] == speed_x) && (y[0] == speed_y)) {
+			playSound(munch, false);
+			
+			timer.stop();
+			timer = new Timer(delay + level * 20, this);
+			timer.restart();
+			
+			deleteSpeed();
+		}
+	}
+	// checks if the snake makes contact with a speed powerup that slows the snake down
+	private void checkSecondLife() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+
+		if ((x[0] == lives_x) && (y[0] == lives_y)) {
+			playSound(munch, false);
+			
+			LIVES++;
+			
+			deleteSecondLife();
+		}
+	}
 
 	private void playSound(File munch2, boolean repeat)
 			throws LineUnavailableException, IOException, UnsupportedAudioFileException {
@@ -317,7 +367,12 @@ public class Board extends JPanel implements ActionListener {
 				e.printStackTrace();
 			}
 
-			inGame = false;
+			LIVES--;
+			if(LIVES == 0) {
+				inGame = false;
+			} else {
+				locateBomb();
+			}
 		}
 	}
 
@@ -345,31 +400,44 @@ public class Board extends JPanel implements ActionListener {
 			y[0] += DOT_SIZE;
 		}
 	}
+	
+	//this is to reset the snake when there are multiple lives and it goes off-screen
+	private void updateSnake() {
+		LIVES--;
+		if(LIVES == 0) {
+			inGame = false;
+		} else {
+			for (int i = 0; i < dots; i++) {
+				x[i] = B_WIDTH / 2 - i * 10;
+				y[i] = B_HEIGHT / 2;
+			}
+		}
+	}
 
 	// checks if the snake goes out of the game area
 	private void checkCollision() {
-
+		
 		for (int z = dots; z > 0; z--) {
 
 			if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
-				inGame = false;
+				updateSnake();
 			}
 		}
 
 		if (y[0] >= B_HEIGHT) {
-			inGame = false;
+			updateSnake();
 		}
 
 		if (y[0] < 0) {
-			inGame = false;
+			updateSnake();
 		}
 
 		if (x[0] >= B_WIDTH) {
-			inGame = false;
+			updateSnake();
 		}
 
 		if (x[0] < 0) {
-			inGame = false;
+			updateSnake();
 		}
 
 		if (!inGame) {
@@ -387,6 +455,59 @@ public class Board extends JPanel implements ActionListener {
 		apple_y = ((r * DOT_SIZE));
 	}
 
+	// sets the initial location of the speed powerup
+	private void locateSpeed() {
+
+		int r = (int) (Math.random() * RAND_POS);
+		speed_x = ((r * DOT_SIZE));
+
+		r = (int) (Math.random() * RAND_POS);
+		speed_y = ((r * DOT_SIZE));
+		
+		if ((speed_x == bombx && speed_y == bomby) ||
+				(speed_x == lives_x && speed_y == lives_y) ||
+				(speed_x == apple_x && speed_y == apple_y)) {
+			r = (int) (Math.random() * RAND_POS);
+			speed_x = ((r * DOT_SIZE));
+
+			r = (int) (Math.random() * RAND_POS);
+			speed_y = ((r * DOT_SIZE));
+		}
+	}
+	
+	// sets the initial location of the second life powerup
+		private void locateSecondLife() {
+
+			int r = (int) (Math.random() * RAND_POS);
+			lives_x = ((r * DOT_SIZE));
+
+			r = (int) (Math.random() * RAND_POS);
+			lives_y = ((r * DOT_SIZE));
+			
+			if ((lives_x == bombx && lives_y == bomby) || (lives_x == apple_x && lives_y == apple_y)
+					|| (lives_x == speed_x && lives_y == speed_y)) {
+				r = (int) (Math.random() * RAND_POS);
+				lives_x = ((r * DOT_SIZE));
+
+				r = (int) (Math.random() * RAND_POS);
+				lives_y = ((r * DOT_SIZE));
+			}
+		}
+	
+	//removes the speed powerup from the board after it gets eaten once
+	private void deleteSpeed() {
+		speed_x = 10000;
+		speed_y = 10000;
+		
+	}
+	
+	//removes the second life powerup from the board after it gets eaten once
+	private void deleteSecondLife() {
+		lives_x = 10001;
+		lives_y = 10001;
+		
+	}
+		
 	// sets the location of the bomb
 	private void locateBomb() {
 		int r = (int) (Math.random() * RAND_POS);
@@ -411,6 +532,8 @@ public class Board extends JPanel implements ActionListener {
 
 			try {
 				checkApple();
+				checkSpeed();
+				checkSecondLife();
 			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
