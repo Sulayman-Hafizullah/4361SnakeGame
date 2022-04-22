@@ -71,9 +71,27 @@ public class Cube {
 		// g.drawRect(x + shift, y + shift, size, size);
 		g.fillRect(x + shift, y + shift, size, size);
 		// draw connecting lines
+		g.setColor(java.awt.Color.BLACK);
 		for (int i = 0; i < 4; i++) {
+			if(i !=2) {
 			g.drawLine(cubeOnePoints[i].x, cubeOnePoints[i].y, cubeTwoPoints[i].x, cubeTwoPoints[i].y);
-
+			}
+			if(i == 3) { //back lines
+				//g.drawLine(cubeOnePoints[i].x, cubeOnePoints[i].y, cubeTwoPoints[i].x + 5, cubeOnePoints[i].y);
+				g.drawLine(cubeOnePoints[i].x, cubeOnePoints[i].y, cubeOnePoints[i].x, cubeOnePoints[i].y-10);
+				g.drawLine(cubeOnePoints[i].x, cubeOnePoints[i].y-10, cubeTwoPoints[i].x + 5, cubeOnePoints[i].y-10);
+				//g.drawLine(cubeOnePoints[i].x+10, cubeOnePoints[i].y, cubeOnePoints[i].x+10, cubeOnePoints[i].y-10);
+			}
+			else if(i == 1) { //top line
+				g.drawLine(cubeOnePoints[i].x-5, cubeTwoPoints[i].y-1, cubeTwoPoints[i].x, cubeTwoPoints[i].y-1);
+				//front right
+				g.drawLine(cubeTwoPoints[i].x, cubeTwoPoints[i].y-1, cubeTwoPoints[i].x, cubeTwoPoints[i].y+10);
+			}
+			else if(i == 2) { //front bottom
+				g.drawLine(cubeTwoPoints[i].x, cubeTwoPoints[i].y, cubeOnePoints[i].x-5, cubeTwoPoints[i].y);
+				//front left line
+				g.drawLine(cubeOnePoints[i].x-5, cubeTwoPoints[i].y, cubeOnePoints[i].x-5, cubeTwoPoints[i].y-11);
+			}
 		}
 
 	}
